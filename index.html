@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Crawler</title>
+    <link rel="icon" href="/static/spider.png" type="image/png">
+    <link rel="shortcut icon" href="/static/spider.png" type="image/png">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: #f4f4f4;
+        }
+
+        .container {
+            text-align: center;
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 600px;
+        }
+
+        h2 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            outline: none;
+            transition: border 0.3s ease-in-out;
+        }
+
+        input:focus {
+            border: 2px solid #007BFF;
+        }
+
+        .buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease-in-out, transform 0.2s ease-in-out;
+        }
+
+        .crawl-btn {
+            background: #007BFF;
+            color: #fff;
+        }
+
+        .crawl-btn:hover {
+            background: #0056b3;
+        }
+
+        .continue-btn {
+            background: #ffc107;
+            color: #fff;
+            display: none;
+        }
+
+        .continue-btn:hover {
+            background: #e0a800;
+        }
+
+        .preview-btn {
+            background: #28a745;
+            color: #fff;
+            display: none;
+        }
+
+        .preview-btn:hover {
+            background: #1e7e34;
+        }
+
+        #status {
+            margin-top: 15px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .progress-container {
+            width: 100%;
+            background: #ddd;
+            height: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            display: none;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            width: 0%;
+            height: 100%;
+            background: #007BFF;
+            transition: width 0.5s linear;
+        }
+
+        .separator {
+            margin-top: 15px;
+            height: 1px;
+            width: 100%;
+            background: #ccc;
+            display: none;
+        }
+
+        .preview-container {
+            margin-top: 15px;
+            display: none;
+        }
+
+        iframe {
+            width: 100%;
+            height: 300px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        #options-container {
+            display: none;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            text-align: left;
+        }
+
+        #options-container label {
+            display: block;
+            margin: 5px 0;
+            font-size: 15px;
+        }
+
+        #debug-container {
+            margin-top: 15px;
+            padding: 10px;
+            background: #f8f8f8;
+            border-radius: 8px;
+            text-align: left;
+            font-size: 12px;
+            display: none;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        .github-link {
+        position: fixed; /* Sticks the link to the viewport */
+        top: 10px; /* Distance from the top */
+        right: 10px; /* Distance from the right */
+        z-index: 1000; /* Ensures it stays above other elements */
+        background: #fff; /* Optional: Add a background for better visibility */
+        padding: 5px 10px; /* Optional: Add some padding */
+        border-radius: 8px; /* Optional: Rounded corners */
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Optional: Add a shadow */
+    }
+
+    .github-link a {
+        display: flex;
+        align-items: center;
+        gap: 8px; /* Space between the icon and text */
+    }
+
+    .github-link img {
+        width: 24px; /* Adjust icon size */
+        height: 24px;
+    }
+
+    @media (max-width: 600px) {
+        .github-link span {
+            display: none; /* Hide the text on smaller screens */
+        }
+
+        .github-link img {
+            width: 20px; /* Adjust icon size for smaller screens */
+            height: 20px;
+        }
+    }
+    </style>
+</head>
+<body>
+
+    <div class="github-link">
+        <a href="https://github.com/soricine/web-crawler" target="_blank" style="text-decoration: none; color: #333;">
+            <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub Logo" style="width: 30px; height: 30px; vertical-align: middle;">
+            <span style="font-size: 16px; font-weight: bold; margin-left: 8px;">View on GitHub</span>
+        </a>
+    </div>
+
+    <div class="container">
+        <h2>🔍 Web Crawler</h2>
+
+        <input type="text" id="domainInput" placeholder="Enter website URL (e.g., https://example.com)">
+
+        <div class="buttons">
+            <button class="crawl-btn" onclick="startInitialCrawl()">Crawl the Site</button>
+            <button class="continue-btn" onclick="askDownloadAndContinue()">Continue to Preview and Download JSON files</button>
+        </div>
+
+        <p id="status"></p>
+
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <div id="debug-container"></div>
+
+        <div class="separator"></div>
+
+        <div id="options-container">
+            <strong>Choose a view option:</strong><br>
+            <label><input type="radio" name="viewOption" value="1" checked onchange="updateIframeStyle()"> Default Style</label>
+            <label><input type="radio" name="viewOption" value="2" onchange="updateIframeStyle()"> Dark Theme</label>
+            <label><input type="radio" name="viewOption" value="3" onchange="updateIframeStyle()"> Serif Theme</label>
+        </div>
+
+        <div class="buttons">
+            <button class="preview-btn" onclick="previewCrawledSite()">Click here to Preview the Crawled Site with a diff style</button>
+        </div>
+
+        <div class="preview-container">
+            <iframe id="sitePreview" src="/placeholder.svg" frameborder="0"></iframe>
+        </div>
+    </div>
+
+    <script>
+        
+        const API_BASE_URL = "https://scraper.backupbrain.co/"; // This will use the current host
+
+        function debugLog(message) {
+            const debugContainer = document.getElementById('debug-container');
+            debugContainer.style.display = 'block';
+            const timestamp = new Date().toLocaleTimeString();
+            debugContainer.innerHTML += `<div>[${timestamp}] ${message}</div>`;
+            console.log(message);
+        }
+
+        let domain = ""; // Declare the domain variable globally
+
+async function startInitialCrawl() {
+    const inputField = document.getElementById('domainInput');
+    domain = inputField.value.trim(); // Read the value before clearing it
+
+    if (!domain) {
+        alert("Please enter a website URL.");
+        return;
+    }
+
+    inputField.value = ""; // Clear the input field after reading the value
+
+    const statusElement = document.getElementById('status');
+    const progressBar = document.getElementById('progressBar');
+    const progressContainer = document.querySelector('.progress-container');
+
+    progressBar.style.width = "0%";
+    progressContainer.style.display = "block";
+    statusElement.textContent = "Just started the Crawling of the Site...";
+
+    try {
+        debugLog(`Sending request to ${API_BASE_URL}/crawl`);
+        const response = await fetch(`${API_BASE_URL}/crawl`, {
+            method: "POST",
+            headers: { 
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify({ domain })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const responseText = await response.text();
+        debugLog(`Response received: ${responseText}`);
+        
+        let data;
+        try {
+            data = JSON.parse(responseText);
+        } catch (parseError) {
+            throw new Error(`Failed to parse JSON: ${responseText.substring(0, 100)}...`);
+        }
+
+        progressBar.style.width = "100%";
+        setTimeout(() => { progressContainer.style.display = "none"; }, 500);
+
+        statusElement.textContent = `Crawling complete! ${data.pages_crawled} pages found.`;
+
+        document.querySelector('.continue-btn').style.display = 'block';
+    } catch (error) {
+        progressContainer.style.display = "none";
+        statusElement.textContent = `Error during crawling: ${error.message}`;
+        debugLog(`Error: ${error.message}`);
+        console.error("Crawling error:", error);
+    }
+}
+function askDownloadAndContinue() {
+    // Download the JSON file directly
+    const jsonDownloadLink = document.createElement('a');
+    jsonDownloadLink.href = `${API_BASE_URL}/get-json?domain=${encodeURIComponent(domain)}`;
+    jsonDownloadLink.download = 'crawled-data.json'; // Set the default filename
+    document.body.appendChild(jsonDownloadLink);
+    jsonDownloadLink.click();
+    document.body.removeChild(jsonDownloadLink);
+
+    // Download the content file directly
+    const contentDownloadLink = document.createElement('a');
+    contentDownloadLink.href = `${API_BASE_URL}/get-content?domain=${encodeURIComponent(domain)}`;
+    contentDownloadLink.download = 'crawled-content.html'; // Set the default filename
+    document.body.appendChild(contentDownloadLink);
+    contentDownloadLink.click();
+    document.body.removeChild(contentDownloadLink);
+
+    // Show the preview button and other UI elements
+    document.querySelector('.preview-btn').style.display = 'block';
+    document.querySelector('.separator').style.display = 'block';
+    document.getElementById('options-container').style.display = 'block';
+}
+
+        function updateIframeStyle() {
+        const selectedOption = document.querySelector('input[name="viewOption"]:checked').value;
+        const iframe = document.getElementById('sitePreview');
+        iframe.src = `${API_BASE_URL}/serve-page?domain=${encodeURIComponent(domain)}&style=${selectedOption}`;
+}
+
+// Add the missing previewCrawledSite function
+function previewCrawledSite() {
+    debugLog("Preview button clicked");
+    
+    // Make sure we have a domain
+    if (!domain) {
+        alert("Please crawl a website first.");
+        return;
+    }
+    
+    // Get the selected style option
+    const selectedOption = document.querySelector('input[name="viewOption"]:checked') 
+        ? document.querySelector('input[name="viewOption"]:checked').value 
+        : "1";
+    
+    // Show the preview container
+    document.querySelector('.preview-container').style.display = 'block';
+    
+    // Update the iframe source
+    const iframe = document.getElementById('sitePreview');
+    const iframeSrc = `${API_BASE_URL}/serve-page?domain=${encodeURIComponent(domain)}&style=${selectedOption}`;
+    
+    debugLog(`Loading iframe with: ${iframeSrc}`);
+    iframe.src = iframeSrc;
+    
+    // Update status
+    document.getElementById('status').textContent = "Loading preview...";
+    
+    // Add event listeners to the iframe
+    iframe.onload = function() {
+        document.getElementById('status').textContent = "Preview loaded successfully!";
+    };
+    
+    iframe.onerror = function() {
+        document.getElementById('status').textContent = "Error loading preview. Please try again.";
+        debugLog("Iframe failed to load");
+    };
+}
+
+// Trigger startInitialCrawl() when "Enter" is pressed in the input field
+document.getElementById('domainInput').addEventListener('keypress', function (event) {
+    if (event.key === 'Enter') {
+        event.preventDefault(); // Prevent the default form submission behavior
+        startInitialCrawl(); // Call the function
+    }
+});
+
+        // Test API connection on page load
+        window.addEventListener('load', async () => {
+            try {
+                const response = await fetch(`${API_BASE_URL}/test`);
+                if (response.ok) {
+                    const data = await response.json();
+                    debugLog(`API connection test: ${data.status}`);
+                } else {
+                    debugLog(`API connection test failed: ${response.status}`);
+                }
+            } catch (error) {
+                debugLog(`API connection error: ${error.message}`);
+            }
+        });
+    </script>
+
+</body>
+</html>
