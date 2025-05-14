@@ -204,7 +204,7 @@
 <body>
 
     <div class="github-link">
-        <a href="https://github.com/soricine/web-crawler" target="_blank" style="text-decoration: none; color: #333;">
+        <a href="https://github.com/soricine/web-crawler#" target="_blank" style="text-decoration: none; color: #333;">
             <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub Logo" style="width: 30px; height: 30px; vertical-align: middle;">
             <span style="font-size: 16px; font-weight: bold; margin-left: 8px;">View on GitHub</span>
         </a>
@@ -217,7 +217,7 @@
 
         <div class="buttons">
             <button class="crawl-btn" onclick="startInitialCrawl()">Crawl the Site</button>
-            <button class="continue-btn" onclick="askDownloadAndContinue()">Continue to Preview and Download JSON files</button>
+            <button class="continue-btn" onclick="askDownloadAndContinue()">Preview the main page of  the site with diff style</button>
         </div>
 
         <p id="status"></p>
@@ -260,91 +260,136 @@
 
         let domain = ""; // Declare the domain variable globally
 
-async function startInitialCrawl() {
-    const inputField = document.getElementById('domainInput');
-    domain = inputField.value.trim(); // Read the value before clearing it
+        async function startInitialCrawl() {
+        const crawlButton = document.querySelector('.crawl-btn');
+        const continueButton = document.querySelector('.continue-btn');
+        const inputField = document.getElementById('domainInput');
+        const statusElement = document.getElementById('status');
+        const progressBar = document.getElementById('progressBar');
+        const progressContainer = document.querySelector('.progress-container');
 
-    if (!domain) {
-        alert("Please enter a website URL.");
-        return;
-    }
+        // Disable the crawl button
+        crawlButton.disabled = true;
+        crawlButton.style.opacity = "0.6";
+        crawlButton.style.cursor = "not-allowed";
 
-    inputField.value = ""; // Clear the input field after reading the value
+        domain = inputField.value.trim(); // Read the value before clearing it
 
-    const statusElement = document.getElementById('status');
-    const progressBar = document.getElementById('progressBar');
-    const progressContainer = document.querySelector('.progress-container');
-
-    progressBar.style.width = "0%";
-    progressContainer.style.display = "block";
-    statusElement.textContent = "Just started the Crawling of the Site...";
-
-    try {
-        debugLog(`Sending request to ${API_BASE_URL}/crawl`);
-        const response = await fetch(`${API_BASE_URL}/crawl`, {
-            method: "POST",
-            headers: { 
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            },
-            body: JSON.stringify({ domain })
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+        if (!domain) {
+            alert("Please enter a website URL.");
+            crawlButton.disabled = false; // Re-enable the button
+            crawlButton.style.opacity = "1";
+            crawlButton.style.cursor = "pointer";
+            return;
         }
 
-        const responseText = await response.text();
-        debugLog(`Response received: ${responseText}`);
-        
-        let data;
+        inputField.value = ""; // Clear the input field after reading the value
+
+        progressBar.style.width = "0%";
+        progressContainer.style.display = "block";
+        statusElement.textContent = "Start Crawling the webSite, it might take some seconds ...";
+        setTimeout(() => {
+             statusElement.textContent = "It depends on the speed of the web connection, please wait a few more moments ...";
+            }, 20000);
+
         try {
-            data = JSON.parse(responseText);
-        } catch (parseError) {
-            throw new Error(`Failed to parse JSON: ${responseText.substring(0, 100)}...`);
+            debugLog(`Sending request to ${API_BASE_URL}/crawl`);
+            const response = await fetch(`${API_BASE_URL}/crawl`, {
+                method: "POST",
+                headers: { 
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+                body: JSON.stringify({ domain })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const responseText = await response.text();
+            debugLog(`Response received: ${responseText}`);
+            
+            let data;
+            try {
+                data = JSON.parse(responseText);
+            } catch (parseError) {
+                throw new Error(`Failed to parse JSON: ${responseText.substring(0, 100)}...`);
+            }
+
+            // Simulate progress bar updates based on actual crawling progress
+            const totalPages = data.pages_crawled;
+            const estimatedTime = totalPages * 2; // Assume 2 seconds per page
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 100 / estimatedTime; // Increment progress based on estimated time
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                }
+                progressBar.style.width = `${progress}%`;
+            }, 1000); // Update every second
+
+            // Wait for the estimated time to complete
+            for (let i = 0; i < totalPages; i++) {
+                await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate 2 seconds per page
+                progress = ((i + 1) / totalPages) * 100; // Update progress based on pages crawled
+                progressBar.style.width = `${progress}%`;
+            }
+
+            progressBar.style.width = "100%";
+            setTimeout(() => { progressContainer.style.display = "none"; }, 500);
+
+            statusElement.textContent = `Crawling complete!`; 
+            // ${data.pages_crawled}  
+
+            // Show the continue button
+            continueButton.style.display = 'block';
+
+            // Re-enable the crawl button
+            crawlButton.disabled = false;
+            crawlButton.style.opacity = "1";
+            crawlButton.style.cursor = "pointer";
+        } catch (error) {
+            progressContainer.style.display = "none";
+            statusElement.textContent = `Error during crawling: ${error.message}`;
+            debugLog(`Error: ${error.message}`);
+            console.error("Crawling error:", error);
+
+            // Re-enable the crawl button in case of an error
+            crawlButton.disabled = false;
+            crawlButton.style.opacity = "1";
+            crawlButton.style.cursor = "pointer";
         }
-
-        progressBar.style.width = "100%";
-        setTimeout(() => { progressContainer.style.display = "none"; }, 500);
-
-        statusElement.textContent = `Crawling complete! ${data.pages_crawled} pages found.`;
-
-        document.querySelector('.continue-btn').style.display = 'block';
-    } catch (error) {
-        progressContainer.style.display = "none";
-        statusElement.textContent = `Error during crawling: ${error.message}`;
-        debugLog(`Error: ${error.message}`);
-        console.error("Crawling error:", error);
     }
-}
-function askDownloadAndContinue() {
+
     // Download the JSON file directly
-    const jsonDownloadLink = document.createElement('a');
-    jsonDownloadLink.href = `${API_BASE_URL}/get-json?domain=${encodeURIComponent(domain)}`;
-    jsonDownloadLink.download = 'crawled-data.json'; // Set the default filename
-    document.body.appendChild(jsonDownloadLink);
-    jsonDownloadLink.click();
-    document.body.removeChild(jsonDownloadLink);
+    function askDownloadAndContinue() {
+        // Download the JSON file directly
+        const jsonDownloadLink = document.createElement('a');
+        jsonDownloadLink.download = 'crawled-data.json'; // Set the default filename
+        document.body.appendChild(jsonDownloadLink);
+        jsonDownloadLink.click();
+        document.body.removeChild(jsonDownloadLink);
 
-    // Download the content file directly
-    const contentDownloadLink = document.createElement('a');
-    contentDownloadLink.href = `${API_BASE_URL}/get-content?domain=${encodeURIComponent(domain)}`;
-    contentDownloadLink.download = 'crawled-content.html'; // Set the default filename
-    document.body.appendChild(contentDownloadLink);
-    contentDownloadLink.click();
-    document.body.removeChild(contentDownloadLink);
+        // Download the content file directly
+        const contentDownloadLink = document.createElement('a');
+        contentDownloadLink.download = 'crawled-content.html'; // Set the default filename
+        document.body.appendChild(contentDownloadLink);
+        contentDownloadLink.click();
+        document.body.removeChild(contentDownloadLink);
 
-    // Show the preview button and other UI elements
-    document.querySelector('.preview-btn').style.display = 'block';
-    document.querySelector('.separator').style.display = 'block';
-    document.getElementById('options-container').style.display = 'block';
-}
+        // Show the preview button and other UI elements
+        document.querySelector('.preview-btn').style.display = 'block';
+        document.querySelector('.separator').style.display = 'block';
+        document.getElementById('options-container').style.display = 'block';
+    }
 
         function updateIframeStyle() {
         const selectedOption = document.querySelector('input[name="viewOption"]:checked').value;
         const iframe = document.getElementById('sitePreview');
         iframe.src = `${API_BASE_URL}/serve-page?domain=${encodeURIComponent(domain)}&style=${selectedOption}`;
-}
+    }
 
 // Add the missing previewCrawledSite function
 function previewCrawledSite() {

@@ -258,7 +258,6 @@ def preview_crawl():
     results = lightweight_crawl(domain)
     return jsonify({"message": "Preview crawl complete", "pages_crawled": len(results)})
 
-
 @app.route('/serve-page', methods=['GET'])
 def serve_page():
     """Serves the first crawled page as an HTML page with dynamic styling."""
@@ -288,24 +287,41 @@ def serve_page():
     # Define CSS styles based on the selected option
     if style_option == "2":  # Dark Theme
         css = """
-        body { font-family: Arial, sans-serif; background: #121212; color: #f1f1f1; padding: 20px; }
+        body { font-family: Arial, sans-serif; background: #121212; color: #f1f1f1; padding: 20px; transition: all 0.3s ease-in-out; }
         h1, h2, h3 { color: #00c6ff; margin-bottom: 15px; }
         p { margin-bottom: 10px; line-height: 1.5; }
         img { max-width: 100%; height: auto; margin: 10px 0; border-radius: 5px; }
         """
     elif style_option == "3":  # Serif Theme
         css = """
-        body { font-family: Georgia, serif; background: #fff8f0; color: #3b2f2f; padding: 20px; line-height: 1.8; }
+        body { font-family: Georgia, serif; background: #fff8f0; color: #3b2f2f; padding: 20px; line-height: 1.8; transition: all 0.3s ease-in-out; }
         h1, h2, h3 { color: #964B00; margin-bottom: 15px; font-family: 'Times New Roman', serif; }
         p { margin-bottom: 10px; }
         img { max-width: 100%; height: auto; margin: 10px 0; border: 1px solid #ddd; padding: 5px; }
         """
     else:  # Default Theme
         css = """
-        body { font-family: Arial, sans-serif; background: #f9f9f9; color: #333; padding: 20px; }
+        body { font-family: Arial, sans-serif; background: #f9f9f9; color: #333; padding: 20px; transition: all 0.3s ease-in-out; }
         h1, h2, h3 { color: #007BFF; margin-bottom: 15px; }
         p { margin-bottom: 10px; line-height: 1.6; }
         img { max-width: 100%; height: auto; margin: 10px 0; border-radius: 5px; }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            h1 { font-size: 24px; }
+            h2 { font-size: 20px; }
+            h3 { font-size: 18px; }
+            p { font-size: 14px; }
+        }
+
+        @media (max-width: 480px) {
+            h1 { font-size: 20px; }
+            h2 { font-size: 18px; }
+            h3 { font-size: 16px; }
+            p { font-size: 12px; }
+        }
         """
 
     # Generate the HTML content with the selected CSS
