@@ -199,6 +199,27 @@
             height: 20px;
         }
     }
+    .sticky-bottom-btn {
+        position: fixed;
+        bottom: 390px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #007BFF;
+        color: #fff;
+        padding: 12px 20px;
+        font-size: 16px;
+        font-weight: bold;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        display: none; /* Initially hidden */
+        z-index: 1000;
+        transition: background 0.3s ease-in-out, transform 0.2s ease-in-out;
+    }
+
+    .sticky-bottom-btn:hover {
+        background: #0056b3;
+    }
     </style>
 </head>
 <body>
@@ -218,6 +239,7 @@
         <div class="buttons">
             <button class="crawl-btn" onclick="startInitialCrawl()">Crawl the Site</button>
             <button class="continue-btn" onclick="askDownloadAndContinue()">Preview the main page of  the site with diff style</button>
+            
         </div>
 
         <p id="status"></p>
@@ -238,6 +260,7 @@
         </div>
 
         <div class="buttons">
+            <button class="sticky-bottom-btn" id="stickyIframeButton" onclick="handleIframeAction()"><a href="mailto:soricine@gmail.com" target="_blank" >Click here to contact with us</a> </button>
             <button class="preview-btn" onclick="previewCrawledSite()">Click here to Preview the Crawled Site with a diff style</button>
         </div>
 
@@ -287,9 +310,9 @@
 
         progressBar.style.width = "0%";
         progressContainer.style.display = "block";
-        statusElement.textContent = "Start Crawling the webSite, it might take some seconds ...";
+        statusElement.textContent = "Start Crawling the webSite, it might take some seconds to complete...";
         setTimeout(() => {
-             statusElement.textContent = "It depends on the speed of the web connection, please wait a few more moments ...";
+             statusElement.textContent = "The crawling time of the servece it depends  of the web connection speed, please wait a few more moments to complete ...";
             }, 20000);
 
         try {
@@ -383,12 +406,14 @@
         document.querySelector('.preview-btn').style.display = 'block';
         document.querySelector('.separator').style.display = 'block';
         document.getElementById('options-container').style.display = 'block';
+
     }
 
         function updateIframeStyle() {
         const selectedOption = document.querySelector('input[name="viewOption"]:checked').value;
         const iframe = document.getElementById('sitePreview');
         iframe.src = `${API_BASE_URL}/serve-page?domain=${encodeURIComponent(domain)}&style=${selectedOption}`;
+
     }
 
 // Add the missing previewCrawledSite function
@@ -428,6 +453,10 @@ function previewCrawledSite() {
         document.getElementById('status').textContent = "Error loading preview. Please try again.";
         debugLog("Iframe failed to load");
     };
+
+            //sticky button
+            const stickyIframeButton = document.getElementById('stickyIframeButton');
+        stickyIframeButton.style.display = 'block';
 }
 
 // Trigger startInitialCrawl() when "Enter" is pressed in the input field
@@ -452,6 +481,11 @@ document.getElementById('domainInput').addEventListener('keypress', function (ev
                 debugLog(`API connection error: ${error.message}`);
             }
         });
+
+        function handleIframeAction() {
+            alert("Action performed on iframe!");
+            debugLog("Sticky button clicked to perform iframe action.");
+        }
     </script>
 
 </body>
