@@ -290,7 +290,21 @@ def serve_page():
         body { font-family: Arial, sans-serif; background: #121212; color: #f1f1f1; padding: 20px; transition: all 0.3s ease-in-out; }
         h1, h2, h3 { color: #00c6ff; margin-bottom: 15px; }
         p { margin-bottom: 10px; line-height: 1.5; }
-        img { max-width: 100%; height: auto; margin: 10px 0; border-radius: 5px; display: block; }
+        img {
+    max-width: 100%; /* Ensures the image scales within its container */
+    height: auto; /* Maintains the aspect ratio */
+    margin: 10px 0; /* Adds vertical spacing */
+    border-radius: 5px; /* Rounds the corners */
+    display: block; /* Ensures the image is treated as a block element */
+    object-fit: cover; /* Ensures the image fills its container without distortion */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow for a smoother look */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Adds smooth transitions for hover effects */
+}
+
+img:hover {
+    transform: scale(1.05); /* Slightly enlarges the image on hover */
+    box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.2); /* Enhances the shadow on hover */
+}
         """
     elif style_option == "3":  # Serif Theme
         css = """
@@ -304,7 +318,21 @@ def serve_page():
         body { font-family: Arial, sans-serif; background: #f9f9f9; color: #333; padding: 20px; transition: all 0.3s ease-in-out; }
         h1, h2, h3 { color: #007BFF; margin-bottom: 15px; }
         p { margin-bottom: 10px; line-height: 1.6; }
-        img { max-width: 100%; height: auto; margin: 10px 0; border-radius: 5px; display: block; }
+        img {
+    max-width: 100%; /* Ensures the image scales within its container */
+    height: auto; /* Maintains the aspect ratio */
+    margin: 10px 0; /* Adds vertical spacing */
+    border-radius: 5px; /* Rounds the corners */
+    display: block; /* Ensures the image is treated as a block element */
+    object-fit: cover; /* Ensures the image fills its container without distortion */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow for a smoother look */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Adds smooth transitions for hover effects */
+}
+
+img:hover {
+    transform: scale(1.05); /* Slightly enlarges the image on hover */
+    box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.2); /* Enhances the shadow on hover */
+}
         }
 
         /* Responsive Design */

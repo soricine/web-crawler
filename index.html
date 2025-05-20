@@ -201,13 +201,13 @@
     }
     .sticky-bottom-btn {
         position: fixed;
-        bottom: 390px;
-        left: 50%;
+        bottom: 480px;
+        left: 60%;
         transform: translateX(-50%);
         background: #007BFF;
         color: #fff;
         padding: 12px 20px;
-        font-size: 16px;
+        font-size: 13px;
         font-weight: bold;
         border: none;
         border-radius: 8px;
@@ -284,108 +284,119 @@
         let domain = ""; // Declare the domain variable globally
 
         async function startInitialCrawl() {
-        const crawlButton = document.querySelector('.crawl-btn');
-        const continueButton = document.querySelector('.continue-btn');
-        const inputField = document.getElementById('domainInput');
-        const statusElement = document.getElementById('status');
-        const progressBar = document.getElementById('progressBar');
-        const progressContainer = document.querySelector('.progress-container');
+    const crawlButton = document.querySelector('.crawl-btn');
+    const continueButton = document.querySelector('.continue-btn');
+    const inputField = document.getElementById('domainInput');
+    const statusElement = document.getElementById('status');
+    const progressBar = document.getElementById('progressBar');
+    const progressContainer = document.querySelector('.progress-container');
+    const optionsContainer = document.getElementById('options-container');
+    const previewContainer = document.querySelector('.preview-container');
+    const stickyIframeButton = document.getElementById('stickyIframeButton');
+    const previewButton = document.querySelector('.preview-btn');
+    const separator = document.querySelector('.separator');
 
-        // Disable the crawl button
-        crawlButton.disabled = true;
-        crawlButton.style.opacity = "0.6";
-        crawlButton.style.cursor = "not-allowed";
+    // Reset visibility of elements
+    optionsContainer.style.display = 'none';
+    previewContainer.style.display = 'none';
+    stickyIframeButton.style.display = 'none';
+    previewButton.style.display = 'none';
+    separator.style.display = 'none';
+    continueButton.style.display = 'none';
 
-        domain = inputField.value.trim(); // Read the value before clearing it
+    // Disable the crawl button
+    crawlButton.disabled = true;
+    crawlButton.style.opacity = "0.6";
+    crawlButton.style.cursor = "not-allowed";
 
-        if (!domain) {
-            alert("Please enter a website URL.");
-            crawlButton.disabled = false; // Re-enable the button
-            crawlButton.style.opacity = "1";
-            crawlButton.style.cursor = "pointer";
-            return;
-        }
+    domain = inputField.value.trim(); // Read the value before clearing it
 
-        inputField.value = ""; // Clear the input field after reading the value
-
-        progressBar.style.width = "0%";
-        progressContainer.style.display = "block";
-        statusElement.textContent = "Start Crawling the webSite, it might take some seconds to complete...";
-        setTimeout(() => {
-             statusElement.textContent = "The crawling time of the servece it depends  of the web connection speed, please wait a few more moments to complete ...";
-            }, 20000);
-
-        try {
-            debugLog(`Sending request to ${API_BASE_URL}/crawl`);
-            const response = await fetch(`${API_BASE_URL}/crawl`, {
-                method: "POST",
-                headers: { 
-                    "Content-Type": "application/json",
-                    "Accept": "application/json"
-                },
-                body: JSON.stringify({ domain })
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const responseText = await response.text();
-            debugLog(`Response received: ${responseText}`);
-            
-            let data;
-            try {
-                data = JSON.parse(responseText);
-            } catch (parseError) {
-                throw new Error(`Failed to parse JSON: ${responseText.substring(0, 100)}...`);
-            }
-
-            // Simulate progress bar updates based on actual crawling progress
-            const totalPages = data.pages_crawled;
-            const estimatedTime = totalPages * 2; // Assume 2 seconds per page
-            let progress = 0;
-            const interval = setInterval(() => {
-                progress += 100 / estimatedTime; // Increment progress based on estimated time
-                if (progress >= 100) {
-                    progress = 100;
-                    clearInterval(interval);
-                }
-                progressBar.style.width = `${progress}%`;
-            }, 1000); // Update every second
-
-            // Wait for the estimated time to complete
-            for (let i = 0; i < totalPages; i++) {
-                await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate 2 seconds per page
-                progress = ((i + 1) / totalPages) * 100; // Update progress based on pages crawled
-                progressBar.style.width = `${progress}%`;
-            }
-
-            progressBar.style.width = "100%";
-            setTimeout(() => { progressContainer.style.display = "none"; }, 500);
-
-            statusElement.textContent = `Crawling complete!`; 
-            // ${data.pages_crawled}  
-
-            // Show the continue button
-            continueButton.style.display = 'block';
-
-            // Re-enable the crawl button
-            crawlButton.disabled = false;
-            crawlButton.style.opacity = "1";
-            crawlButton.style.cursor = "pointer";
-        } catch (error) {
-            progressContainer.style.display = "none";
-            statusElement.textContent = `Error during crawling: ${error.message}`;
-            debugLog(`Error: ${error.message}`);
-            console.error("Crawling error:", error);
-
-            // Re-enable the crawl button in case of an error
-            crawlButton.disabled = false;
-            crawlButton.style.opacity = "1";
-            crawlButton.style.cursor = "pointer";
-        }
+    if (!domain) {
+        alert("Please enter a website URL.");
+        crawlButton.disabled = false; // Re-enable the button
+        crawlButton.style.opacity = "1";
+        crawlButton.style.cursor = "pointer";
+        return;
     }
 
+    inputField.value = ""; // Clear the input field after reading the value
+
+    progressBar.style.width = "0%";
+    progressContainer.style.display = "block";
+    statusElement.textContent = "Start Crawling the webSite, it might take some seconds to complete...";
+    setTimeout(() => {
+        statusElement.textContent = "The crawling time of the service depends on the web connection speed, please wait a few more moments to complete...";
+    }, 20000);
+
+    try {
+        debugLog(`Sending request to ${API_BASE_URL}/crawl`);
+        const response = await fetch(`${API_BASE_URL}/crawl`, {
+            method: "POST",
+            headers: { 
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify({ domain })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const responseText = await response.text();
+        debugLog(`Response received: ${responseText}`);
+        
+        let data;
+        try {
+            data = JSON.parse(responseText);
+        } catch (parseError) {
+            throw new Error(`Failed to parse JSON: ${responseText.substring(0, 100)}...`);
+        }
+
+        // Simulate progress bar updates based on actual crawling progress
+        const totalPages = data.pages_crawled;
+        const estimatedTime = totalPages * 2; // Assume 2 seconds per page
+        let progress = 0;
+        const interval = setInterval(() => {
+            progress += 100 / estimatedTime; // Increment progress based on estimated time
+            if (progress >= 100) {
+                progress = 100;
+                clearInterval(interval);
+            }
+            progressBar.style.width = `${progress}%`;
+        }, 1000); // Update every second
+
+        // Wait for the estimated time to complete
+        for (let i = 0; i < totalPages; i++) {
+            await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate 2 seconds per page
+            progress = ((i + 1) / totalPages) * 100; // Update progress based on pages crawled
+            progressBar.style.width = `${progress}%`;
+        }
+
+        progressBar.style.width = "100%";
+        setTimeout(() => { progressContainer.style.display = "none"; }, 500);
+
+        statusElement.textContent = `Crawling complete!`; 
+
+        // Show the continue button
+        continueButton.style.display = 'block';
+
+        // Re-enable the crawl button
+        crawlButton.disabled = false;
+        crawlButton.style.opacity = "1";
+        crawlButton.style.cursor = "pointer";
+    } catch (error) {
+        progressContainer.style.display = "none";
+        statusElement.textContent = `Error during crawling: ${error.message}`;
+        debugLog(`Error: ${error.message}`);
+        console.error("Crawling error:", error);
+
+        // Re-enable the crawl button in case of an error
+        crawlButton.disabled = false;
+        crawlButton.style.opacity = "1";
+        crawlButton.style.cursor = "pointer";
+    }
+}
     // Download the JSON file directly
     function askDownloadAndContinue() {
         // Download the JSON file directly
