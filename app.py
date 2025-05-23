@@ -287,70 +287,204 @@ def serve_page():
     # Define CSS styles based on the selected option
     if style_option == "2":  # Dark Theme
         css = """
-        body { font-family: Arial, sans-serif; background: #121212; color: #f1f1f1; padding: 20px; transition: all 0.3s ease-in-out; }
-        h1, h2, h3 { color: #00c6ff; margin-bottom: 15px; }
-        p { margin-bottom: 10px; line-height: 1.5; }
+        body {
+            font-family: Arial, sans-serif;
+            background: #121212;
+            color: #f1f1f1;
+            padding: 20px;
+            line-height: 1.6;
+            transition: all 0.3s ease-in-out;
+        }
+        h1, h2, h3 {
+            color: #00c6ff;
+            margin-bottom: 15px;
+        }
+        p {
+            margin-bottom: 10px;
+        }
         img {
-    max-width: 100%; /* Ensures the image scales within its container */
-    height: auto; /* Maintains the aspect ratio */
-    margin: 10px 0; /* Adds vertical spacing */
-    border-radius: 5px; /* Rounds the corners */
-    display: block; /* Ensures the image is treated as a block element */
-    object-fit: cover; /* Ensures the image fills its container without distortion */
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow for a smoother look */
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Adds smooth transitions for hover effects */
-}
-
-img:hover {
-    transform: scale(1.05); /* Slightly enlarges the image on hover */
-    box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.2); /* Enhances the shadow on hover */
-}
+            max-width: 100%;
+            height: auto;
+            margin: 10px 0;
+            border-radius: 8px;
+            display: block;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        img:hover {
+            transform: scale(1.05);
+            box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.5);
+        }
+        ul, ol {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 5px;
+        }
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            h1 {
+                font-size: 24px;
+            }
+            h2 {
+                font-size: 20px;
+            }
+            h3 {
+                font-size: 18px;
+            }
+            p {
+                font-size: 14px;
+            }
+        }
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 20px;
+            }
+            h2 {
+                font-size: 18px;
+            }
+            h3 {
+                font-size: 16px;
+            }
+            p {
+                font-size: 12px;
+            }
+        }
         """
     elif style_option == "3":  # Serif Theme
         css = """
-        body { font-family: Georgia, serif; background: #fff8f0; color: #3b2f2f; padding: 20px; line-height: 1.8; transition: all 0.3s ease-in-out; }
-        h1, h2, h3 { color: #964B00; margin-bottom: 15px; font-family: 'Times New Roman', serif; }
-        p { margin-bottom: 10px; }
-        img { max-width: 100%; height: auto; margin: 10px 0; border: 1px solid #ddd; padding: 5px; display: block; }
+        body {
+            font-family: Georgia, serif;
+            background: #fff8f0;
+            color: #3b2f2f;
+            padding: 20px;
+            line-height: 1.8;
+            transition: all 0.3s ease-in-out;
+        }
+        h1, h2, h3 {
+            color: #964B00;
+            margin-bottom: 15px;
+        }
+        p {
+            margin-bottom: 10px;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            display: block;
+        }
+        ul, ol {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 5px;
+        }
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            h1 {
+                font-size: 24px;
+            }
+            h2 {
+                font-size: 20px;
+            }
+            h3 {
+                font-size: 18px;
+            }
+            p {
+                font-size: 14px;
+            }
+        }
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 20px;
+            }
+            h2 {
+                font-size: 18px;
+            }
+            h3 {
+                font-size: 16px;
+            }
+            p {
+                font-size: 12px;
+            }
+        }
         """
     else:  # Default Theme
         css = """
-        body { font-family: Arial, sans-serif; background: #f9f9f9; color: #333; padding: 20px; transition: all 0.3s ease-in-out; }
-        h1, h2, h3 { color: #007BFF; margin-bottom: 15px; }
-        p { margin-bottom: 10px; line-height: 1.6; }
+        body {
+            font-family: Arial, sans-serif;
+            background: #f9f9f9;
+            color: #333;
+            padding: 20px;
+            line-height: 1.6;
+            transition: all 0.3s ease-in-out;
+        }
+        h1, h2, h3 {
+            color: #007BFF;
+            margin-bottom: 15px;
+        }
+        p {
+            margin-bottom: 10px;
+        }
         img {
-    max-width: 100%; /* Ensures the image scales within its container */
-    height: auto; /* Maintains the aspect ratio */
-    margin: 10px 0; /* Adds vertical spacing */
-    border-radius: 5px; /* Rounds the corners */
-    display: block; /* Ensures the image is treated as a block element */
-    object-fit: cover; /* Ensures the image fills its container without distortion */
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow for a smoother look */
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Adds smooth transitions for hover effects */
-}
-
-img:hover {
-    transform: scale(1.05); /* Slightly enlarges the image on hover */
-    box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.2); /* Enhances the shadow on hover */
-}
+            max-width: 100%;
+            height: auto;
+            margin: 10px 0;
+            border-radius: 8px;
+            display: block;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-
-        /* Responsive Design */
+        img:hover {
+            transform: scale(1.05);
+            box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.2);
+        }
+        ul, ol {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 5px;
+        }
         @media (max-width: 768px) {
-            body { padding: 10px; }
-            h1 { font-size: 24px; }
-            h2 { font-size: 20px; }
-            h3 { font-size: 18px; }
-            p { font-size: 14px; }
-            img { margin: 5px 0; }
+            body {
+                padding: 10px;
+            }
+            h1 {
+                font-size: 24px;
+            }
+            h2 {
+                font-size: 20px;
+            }
+            h3 {
+                font-size: 18px;
+            }
+            p {
+                font-size: 14px;
+            }
         }
-
         @media (max-width: 480px) {
-            h1 { font-size: 20px; }
-            h2 { font-size: 18px; }
-            h3 { font-size: 16px; }
-            p { font-size: 12px; }
-            img { margin: 5px 0; }
+            h1 {
+                font-size: 20px;
+            }
+            h2 {
+                font-size: 18px;
+            }
+            h3 {
+                font-size: 16px;
+            }
+            p {
+                font-size: 12px;
+            }
         }
         """
 
